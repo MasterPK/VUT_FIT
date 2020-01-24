@@ -1,0 +1,102 @@
+{block header}
+Seznam žádostí
+{/block}
+{block content}
+    {ifset $success_approve}
+        {if $success_approve == true}
+            <script>$.notify("Kurz byl úspěšně povolen.", "success");</script>
+        {else}
+            <script>$.notify("Kurz nebylo možné povolit!", "error");</script>
+        {/if}
+    {/ifset}
+
+    {ifset $success_deny}
+        {if $success_deny == true}
+            <script>$.notify("Kurz byl úspěšně zamítnut.", "success");</script>
+        {else}
+            <script>$.notify("Kurz nebylo možné zamítnout!", "error");</script>
+        {/if}
+    {/ifset}
+
+    {ifset $course}
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card bg-default ">
+                    <div class="card-header"> 
+                        <div class="row">
+                            <div class="col-md-3 col-sm-12">
+                                {$course->id_course}
+                            </div>  
+                            <div class="col-md-9 col-sm-12 ">
+                                <div class="row float-right">
+                                    <a class="ajax" n:href="approveCourse! $course->id_course">
+                                        <button class="btn btn-sm btn-success ml-1"><i class="fas fa-check"></i></button>
+                                    </a>
+                                    <a class="ajax" n:href="denyCourse! $course->id_course">
+                                        <button class="btn btn-sm btn-danger ml-1"><i class="fas fa-times"></i></button>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-2 col-sm-12">
+                                Název:<br>
+                                <b>{$course->course_name}</b>
+                            </div>
+                            <div class="col-md-2 col-sm-12">
+                                Typ:<br>
+                                <b>{$course->course_type}</b>
+                            </div>
+                            <div class="col-md-2 col-sm-12">
+                                Garant:<br>
+                                <b>{$course->id_guarantor}</b>
+                            </div>
+                            <div class="col-md-2 col-sm-12">
+                                Cena:<br>
+                                <b>{$course->course_price}&nbsp;Kč</b>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                Štítky:<br>
+                                <p class="card-text">{$course->tags}</p>
+                            </div>
+                        </div>
+                        
+                        <br>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                Popis:<br>
+                                <p class="card-text">{$course->course_description}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {/ifset}
+
+    {snippet student_snippet}
+        
+        {control allStudentsRequests}
+
+        {ifset $success_accept}
+            {if $success_accept == true}
+                <script>$.notify("Vybraní studenti byly úspěšně schváleni.", "success");</script>
+            {else}
+                <script>$.notify("Vybrané studenty nebylo možné schválit!", "error");</script>
+            {/if}
+        {/ifset}
+
+        {ifset $success_reject}
+            {if $success_reject == true}
+                <script>$.notify("Vybraní studenti byly úspěšně zamítnuti.", "success");</script>
+            {else}
+                <script>$.notify("Vybrané studenty nebylo možné zamítnout!", "error");</script>
+            {/if}
+        {/ifset}
+    {/snippet}
+{/block}

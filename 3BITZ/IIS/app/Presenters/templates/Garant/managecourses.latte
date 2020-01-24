@@ -1,0 +1,15 @@
+{block header}
+Seznam všech kurzů, kde jste lektorem nebo garantem
+{/block}
+{block content}
+{control coursesMng}
+{ifset $course_delete_status}
+    {if $course_delete_status == 1}
+        <script>$.notify("Kurz " + {$deleted_course} + " byl úspěšně smazán!", "success");</script>
+    {else}
+        <script>$.notify("Došlo k chybě při mazání kurzu" + {$deleted_course} + "!", "error");</script>
+    {/if}
+{/ifset}
+
+{/block}
+

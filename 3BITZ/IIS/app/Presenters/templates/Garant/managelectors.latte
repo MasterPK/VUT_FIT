@@ -1,0 +1,87 @@
+{block header}
+Přidat lektory
+{/block}
+{block content}
+{control lectorsAdd}
+{control lectorsRemove}
+<!--
+{snippet manage_snippet}
+{ifset $current_lectors}
+    {if count($current_lectors) > 0}
+    
+    {ifset $remove_lector_success}
+    {if $remove_lector_success == 1}
+        <script>$.notify("Lektor " + {$name} + " byl odebrán", "success");</script>
+    {else}
+        <script>$.notify("Lektora " + {$name} + " nebylo možné odebrat!", "error");</script>
+    {/if}
+    {/ifset}
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Email lektora</th>
+                <th scope="col">Jméno</th>
+                <th scope="col">Odebrat</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {foreach $current_lectors as $row}
+            <tr>
+            <td>{$row->email}</td>
+            <td>{$row->first_name} {$row->surname}</td>
+            <td>
+                <a class="ajax" n:href="remove! $row->id_user, $row->first_name.' '.$row->surname, $id_course"><button class="btn btn-primary btn-sm text-white order-1 order-sm-0">Odebrat</button></a>
+            </td>
+            </tr>
+
+            {/foreach}
+
+        </tbody>
+    </table>
+
+    {/if}
+
+{/ifset}
+
+{ifset $select_lectors}
+    {if count($select_lectors) > 0}
+
+    {ifset $add_lector_success}
+    {if $add_lector_success == 1}
+        <script>$.notify("Lektor " + {$name} + " byl přidán", "success");</script>
+    {else}
+        <script>$.notify("Lektora " + {$name} + " nebylo možné přidat!", "error");</script>
+    {/if}
+    {/ifset}
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Email lektora</th>
+                <th scope="col">Jméno</th>
+                <th scope="col">Přidat</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            {foreach $select_lectors as $row}
+            <tr>
+            <td>{$row->email}</td>
+            <td>{$row->first_name} {$row->surname}</td>
+            <td>
+                <a class="ajax" n:href="add! $row->id_user, $row->first_name.' '.$row->surname, $id_course"><button class="btn btn-primary btn-sm text-white order-1 order-sm-0">Přidat</button></a>
+            </td>
+            </tr>
+
+            {/foreach}
+
+        </tbody>
+    </table>
+
+    {/if}
+
+{/ifset}
+{/snippet}!-->
+{/block}

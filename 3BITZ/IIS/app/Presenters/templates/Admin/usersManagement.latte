@@ -1,0 +1,57 @@
+{block header} Správa uživatelů{/block}
+{block content}
+    <div class="row">
+        <div class="col-sm-12">
+            {control userMng}
+        </div>
+    </div>
+
+
+{ifset $success_notify}
+    <script>$.notify("Operace byla provedena", "success");</script>
+{/ifset}
+{ifset $error_notify}
+    <script>$.notify("Operace selhala!", "error");</script>
+{/ifset}
+
+
+{snippet password_snippet}
+    {ifset $success_password}
+        <script>$.notify("Heslo úspěšně změněno", "success");</script>
+    {/ifset}
+{/snippet}
+{snippet edit_snippet}
+    {ifset $success_edit}
+        <script>$.notify("Uživatel úspěšně aktualizován", "success");</script>
+    {/ifset}
+{/snippet}
+
+{snippet confirm_snippet}
+    {ifset $delete_confirm}
+        <div class="modal fade" id="{$delete_user_id}">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Potvrzení</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Opravdu smazat uživatele {$delete_user}?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Zrušit</button>
+                        <a class="ajax" n:href="delete! $delete_user_id"><button onClick="hide({$delete_user_id})" type="button" class="btn btn-primary">Potvrdit</button></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>$('#' + {$delete_user_id}).modal('show');</script>
+    {/ifset}
+{/snippet}
+
+<script>
+function hide(id)
+{
+    $("#" + id).modal("hide"); 
+}
+</script>
+{/block}

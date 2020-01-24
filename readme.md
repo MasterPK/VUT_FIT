@@ -31,7 +31,7 @@
 * Projekt 8 - 5/5
 ### IVS
 * Projekt 1 - Testování Softwaru - 10/18
-* Projekt 2 - Týmová spolupráce - 52/52
+* Projekt 2 - Týmová spolupráce - 52/52 (https://github.com/MasterPK/FIT_IVS_Projekt_2)
 ## 2BITZ
 
 ### IAL

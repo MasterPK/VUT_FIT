@@ -1,0 +1,18 @@
+parameters:
+
+
+database:
+	dsn: 'mysql:host=innodb.endora.cz:3306;dbname=vutfit;'
+	user: vutfit
+	password: VUTfit123
+
+services:
+	-	App\Model\StartUp
+	-	App\Model\StudentModel
+	-	App\Model\LectorModel
+	-	App\Model\GarantModel
+	-	App\Model\ChiefModel
+	-	App\Model\AdminModel
+	-	App\Model\VisitorModel
+	-	App\Model\MainModel
+	-	App\Model\DataGridModel

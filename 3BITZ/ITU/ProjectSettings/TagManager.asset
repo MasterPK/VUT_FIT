@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Button2
+  - Text2
+  - music
+  - endGamePanel
+  - PageText
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - Button1
+  - Button2
+  - Icon
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 1555176213
+    locked: 0
+  - name: Button1
+    uniqueID: 1748336697
+    locked: 0
+  - name: Button2
+    uniqueID: 1505077485
+    locked: 0
+  - name: Icon
+    uniqueID: 4246706153
+    locked: 0

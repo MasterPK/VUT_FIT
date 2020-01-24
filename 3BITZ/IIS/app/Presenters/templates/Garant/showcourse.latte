@@ -1,0 +1,336 @@
+{block header}
+Detail kurzu
+{/block}
+{block content}
+<div class="row">
+    <div class="col-sm-12">
+        {snippet studentRegistrationErrorSnippet}
+        {ifset $succes_notif}
+        <script>$.notify("Operace byla provedena!", "success");</script>
+        {/ifset}
+        {ifset $error_notif}
+        <script>$.notify("Operace selhala!", "error");</script>
+        {/ifset}
+        {/snippet}
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12">
+        <div class="card bg-default ">
+            <div class="card-header"> 
+                <div class="row">
+                    <div class="col-md-3 col-sm-12">
+                        {$course->id_course}
+                    </div>
+                    {if $userIsGuarantorInCourse == true}
+                        <div class="col-md-9 col-sm-12 ">
+                            <div class="row float-right">
+                                {ifset $courseActive}
+                                    {ifset $openRegistration}
+                                        <form n:name="closeRegisterForm">
+                                                {input register}
+                                        </form>
+                                    {else}
+                                        <form n:name="openRegisterForm">
+                                                {input register}
+                                        </form>
+                                    {/ifset}                                   
+                                    
+                                    <a n:href="Garant:managelectors $course->id_course" class="btn btn-sm btn-primary ml-1">Správa lektorů</a>
+                                    <a id="btnpopover" class="btn btn-sm btn-primary ml-1"><i class="fas fa-plus-square text-white"></i></a>
+                                    <a n:href="Garant:course $course->id_course" class="btn btn-sm btn-primary ml-1"><i class="fas fa-edit "></i></a>
+
+                                    {ifset $id_course}
+                                    <button class="btn btn-sm btn-primary ml-1" onClick="show({$id_course})"><i class="fas fa-trash"></i></button>
+                                    <div class="modal fade" id="{$id_course}">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h4 class="modal-title">Potvrzení</h4>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>Opravdu smazat kurz {$id_course}?</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Zrušit</button>
+                                                    <a class="ajax" n:href="deleteCourse! $id_course"><button onClick="hide({$id_course})" type="button" class="btn btn-primary">Potvrdit</button></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {/ifset}
+                                {/ifset}
+                            </div>
+                        </div>
+                    {/if}
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-2 col-sm-12">
+                        Typ:<br>
+                        <b>{$type}</b>
+                    </div>
+                    <div class="col-md-2 col-sm-12">
+                        Garant kurzu:<br>
+                        <b>{$guarantor}</b>
+                    </div>
+                    <div class="col-md-2 col-sm-12">
+                        Cena:<br>
+                        <b>{$course->course_price}&nbsp;Kč</b>
+                    </div>
+                    {ifset $courseActive}
+                        <div class="col-md-3 col-sm-12">
+                            Stav registrací:<br>
+                            <b>{if $course->course_status == 2}Otevřeno{else}Zavřeno{/if}</b>
+                        </div>
+                        {if $userIsGuarantorInCourse == false && $userIsLectorInCourse == false}
+                            <div class="col-md-3 col-sm-12">
+                                Stav Vaší registrace:<br>
+                                <b>{ifset $userCourseStatus}{if $userCourseStatus == 0 }Čeká se na schválení{elseif $userCourseStatus == 1}Potvrzeno{elseif $userCourseStatus == 2}Zamítnuto{/if}{else}Žádná žádost neexistuje!{/ifset}</b>
+                            </div>
+                        {/if}
+                    {else}
+                        {if $course->course_status == 0}
+                            <div class="col-md-3 col-sm-12">
+                                Stav registrací:<br>
+                                <b>Čeká se na schválení kurzu</b>
+                            </div>
+                        {else}
+                            <div class="col-md-3 col-sm-12">
+                                Stav registrací:<br>
+                                <b>Kurz byl zamítnut</b>
+                            </div>
+                        {/if}
+                    {/ifset}
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-sm-12">
+                        Štítky:<br>
+                        <p class="card-text">{$course->tags}</p>
+                    </div>
+                </div>
+                
+                <br>
+                <div class="row">
+                    <div class="col-sm-12">
+                        Popis:<br>
+                        <p class="card-text">{$course->course_description}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+{ifset $courseActive}
+{snippet studentRegistration}
+{if $userIsGuarantorInCourse == false && $userIsLectorInCourse == false}
+{ifset $openRegistration}
+{ifset $userCourseStatus}
+{if $userCourseStatus==1}
+<div class="row">
+    <div class="col-auto mr-auto"></div>
+    <div class="col-auto">
+        <form n:name="unRegisterForm">
+            <div class="form-group text-center ">
+                {input register}
+            </div>
+        </form>
+    </div>
+</div>
+{/if}
+{else}
+<div class="row">
+    <div class="col-auto mr-auto"></div>
+    <div class="col-auto">
+        <form n:name="registerForm">
+            <div class="form-group text-center ">
+                {input register}
+            </div>
+        </form>
+    </div>
+</div>
+{/ifset}
+{/ifset}
+{/if}
+
+{/snippet}
+
+
+{snippet course_tasks_snippet}
+{ifset $course_tasks}
+<div class="row">
+    <div class="col-sm-12">
+        {foreach $course_tasks as $task}
+            <div class="card bg-default mt-1">
+                <div class="card-header">  
+                    <div class="row">
+                        <div class="col-md-3 col-sm-12 ">
+                            {$task->task_name}
+                        </div>
+                        {if $userIsGuarantorInCourse == true || $userIsLectorInCourse == true}
+                            <div class="col-md-9 col-sm-12 ">
+                                <div class="row float-right">
+                                    <a n:href="Garant:showtask $task->id_task" class="btn btn-primary btn-sm ml-1" title="Zadat body"><i class="fas fa-user-graduate"></i></a>
+                                    <a n:href="Lector:files $task->id_course, $task->id_task" class="btn btn-sm btn-primary btn-sm ml-1" title="Soubory"><i class="fas fa-file"/></a>
+
+                                    <div class="modal fade" id="{$task->id_task}">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h4 class="modal-title">Potvrzení</h4>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>Opravdu smazat termín {$task->task_name}?</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Zrušit</button>
+                                                    <a class="ajax" n:href="deleteTask! $task->id_task, $task->id_course"><button onClick="hide({$task->id_task})" type="button" class="btn btn-primary">Potvrdit</button></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <a n:href="Garant:newtask $task->id_course, $task->task_type, $task->id_task" class="btn btn-primary btn-sm ml-1" title="Upravit termín"><i class="fas fa-edit"/></a>
+                                    <a class="btn btn-primary btn-sm ml-1 text-white" onClick="show({$task->id_task})" title="Smazat termín"><i class="fas fa-trash"/></a>
+                                </div>
+                            </div>
+                        {/if}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2 col-sm-12">
+                            Typ:<br>
+                            <b>{switch $task->task_type}
+                            {case "CV"} Cvičení
+                            {case "PR"} Přednáška
+                            {case "DU"} Domácí úkol
+                            {case "PJ"} Projekt
+                            {case "ZK"} Zkouška
+                            {/switch}</b>
+                        </div>
+                        {ifset $task->task_points}
+                        <div class="col-md-2 col-sm-12">
+                            Počet bodů:<br>
+                            <b>{$task->task_points}</b>
+                        </div>
+                        {/ifset}
+                        <div class="col-md-2 col-sm-12">
+                            Datum:<br>
+                            <b>{$task->task_date->format("d.m.Y")}</b>
+                        </div>
+                        {ifset $task->task_from}
+                        <div class="col-md-3 col-sm-12">
+                            Od:<br>
+                            <b>{$task->task_from}:00</b>
+                        </div>
+                        <div class="col-md-3 col-sm-12">
+                            Do:<br>
+                            <b>{$task->task_to}:00</b>
+                        </div>
+                        {else}
+                        <div class="col-md-3 col-sm-12">
+                            Čas:<br>
+                            <b>{$task->task_to}:00</b>
+                        </div>
+                        {/ifset}
+                        {ifset $task->id_room}
+                            <div class="col-md-3 col-sm-12">
+                            Místnost:<br>
+                            <b>{$task->id_room}</b>
+                        </div>
+                        {/ifset}
+                        
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            Popis:<br>
+                            <p class="card-text">{$task->task_description}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {/foreach}
+    </div>
+</div>
+{/ifset}
+{ifset $delete_task_success}
+    {if $delete_task_success == 1}
+        <script>$.notify("Termín " + {$task_name} + " byl úspěšně smazán!", "success");</script>
+    {else}
+        <script>$.notify("Došlo k chybě při mazání termínu" + {$task_name} + "!", "error");</script>
+    {/if}
+{/ifset}
+{/snippet}
+
+
+
+
+<div class="popover_title" style="display: none">
+<h6 class="text-center">Přidat</h6>
+</div>
+<div id="popover_content_wrapper" style="display: none">                 
+    <div class="col-md-12 text-center">
+            <a n:href="Garant:newtask $course->id_course, 'PR'" class="btn btn-primary btn-sm text-white btn-block m-b-1">
+              Přednáška
+            </a>
+            <a n:href="Garant:newtask $course->id_course, 'CV'" class="btn btn-primary btn-sm text-white btn-block m-b-1">
+              Cvičení
+            </a>
+            <a n:href="Garant:newtask $course->id_course, 'DU'" class="btn btn-primary btn-sm text-white btn-block m-b-1">
+              Domácí úkol
+            </a>
+            <a n:href="Garant:newtask $course->id_course, 'PJ'" class="btn btn-primary btn-sm text-white btn-block m-b-1">
+              Projekt
+            </a>
+            <a n:href="Garant:newtask $course->id_course, 'ZK'" class="btn btn-primary btn-sm text-white btn-block m-b-1">
+              Zkouška
+            </a>
+    </div>
+</div>
+
+{/ifset}
+
+<script>
+function show(id)
+{
+    $('#' + id).modal('show');
+}
+
+function hide(id)
+{
+    $("#" + id).modal("hide"); 
+}
+
+
+$("html").on("mouseup", function (e) {
+    var l = $(e.target);
+    if (l[0].className.indexOf("popover") == -1) {
+        $(".popover").each(function () {
+            $(this).popover("hide");
+        });
+    }
+});
+
+$(document).ready(function(){
+     $('#btnpopover').popover({
+       html : true,
+       title:function(){
+          return $('.popover_title').html();
+       },
+       content:function(){
+          return $('#popover_content_wrapper').html();
+       }
+       
+    });
+      
+});    
+    
+    
+
+</script>
+{/block}
+

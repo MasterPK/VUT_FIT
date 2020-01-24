@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 85072a9999f38e840ab2234679045cca
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - pieceManager: {instanceID: 0}
+  - playerCount: {instanceID: 0}
+  - downImage: {instanceID: 0}
+  - upImage: {instanceID: 0}
+  - black: {instanceID: 0}
+  - white: {instanceID: 0}
+  - blackEng: {fileID: 21300000, guid: fd454839157a2794a8bc79583bab1aa8, type: 3}
+  - whiteEng: {fileID: 21300000, guid: 64683e28ccfa5f24d8cb6fa49b5e08ce, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
