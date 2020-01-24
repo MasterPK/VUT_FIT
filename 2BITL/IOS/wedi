@@ -1,0 +1,368 @@
+#!/bin/sh
+
+#wedi
+#IOS - Projekt 1
+#Autor: Petr Krehlik, xkrehl04
+#wrapper textoveho editoru
+
+export POSIXLY_CORRECT=yes
+
+realpath "." >/dev/null
+
+if [ "$?" -ne 0 ]; then
+	echo "CHYBA: Neni k dispozici realpath" >&2
+	exit 1
+fi
+
+if [ -z "$WEDI_RC" ]; then
+	>&2 echo "CHYBA: WEDI_RC neni nastavene" >&2
+	exit 1
+fi
+
+if [ ! -f "$WEDI_RC" ]; then
+	touch "$WEDI_RC" >/dev/null
+	if [ "$?" -eq 1 ]
+	then
+		var=$(dirname "$WEDI_RC")
+		mkdir -p "$var"
+		touch "$WEDI_RC"
+	fi
+fi
+
+if [ -z "$EDITOR" ]; then
+	if [ -z "$VISUAL" ]; then
+		editor="vi"
+	else
+		editor="$VISUAL"
+	fi
+else
+	editor="$EDITOR"
+fi
+
+soubory=$(awk -F  ":" '{print $2}' "$WEDI_RC")
+for a in $soubory
+do
+	if [ ! -f "$a" ]; then
+		line=$(grep -n "$a" "$WEDI_RC")
+		line=$(echo "$line" | cut -d : -f 1 )
+		sed -i -e "$line"d "$WEDI_RC"
+	fi
+done
+
+if [ "$#" -eq 0 ]; then
+	path=$(realpath ".")
+	found=$(grep -n -x .*$path/[^\/]* "$WEDI_RC")
+	if [ -z "$found" ]; then
+		echo "CHYBA: V zadanem adresari nebyl dosud editovan zadny soubor" >&2
+		exit 1
+	else
+		found=$(grep -n -x .*$path/[^\/]* "$WEDI_RC" | tail -1)
+		path=$(echo "$found" | cut -d : -f 3)
+		"$editor" "$path"
+		if [ "$?" -ne 0 ]; then
+			exit "$?"
+		fi
+		line=$(echo "$found" | cut -d : -f 1)
+		sed -i -e "$line"d "$WEDI_RC"
+		name=$(basename "$path")
+		count=$(echo "$found" | cut -d : -f 4)
+		count=$(($count+1))
+		datetime=$(date +%s)
+		echo "$name:$path:$count:$datetime" >> "$WEDI_RC"
+	fi
+fi
+
+
+if [ "$#" -eq 1 ]; then
+	case "$1" in
+		"-m")
+		path=$(realpath ".")
+		if [ -d "$path" ]; then
+			found=$(grep -n -x .*$path/[^\/]* "$WEDI_RC")
+			if [ -z "$found" ]; then
+				echo "CHYBA: V zadanem adresari nebyl dosud editovan zadny soubor" >&2
+				exit 1
+			else
+				found=$(grep -n -x .*$path/[^\/]* "$WEDI_RC" | sort -t: -nk4 | tail -1)
+				path=$(echo "$found" | cut -f3 -d:)
+				"$editor" "$path"
+				if [ "$?" -ne 0 ]; then
+					exit "$?"
+				fi
+				line=$(grep -n "$path": "$WEDI_RC")
+				line=$(echo "$line" | cut -d : -f 1)
+				sed -i -e "$line"d "$WEDI_RC"
+				name=$(basename "$path")
+				count=$(echo "$found" | cut -d : -f 4)
+				count=$(($count+1))
+				datetime=$(date +%s)
+				echo "$name:$path:$count:$datetime" >> "$WEDI_RC"
+			fi
+		else
+			echo "CHYBA: Adresar neexistuje" >&2
+			exit 1
+		fi
+		exit 0
+		;;
+		"-l")
+		path=$(realpath ".")
+		found=$(grep -x .*$path/[^\/]* "$WEDI_RC" | cut -f1 -d:)
+		if [ -z "$found" ]; then
+			echo "CHYBA: V zadanem adresari nebyl dosud editovan zadny soubor" >&2
+			exit 1
+		else
+			echo "$found"
+		fi
+		exit 0
+		;;
+		"-b") echo "CHYBA: Nespravne argumenty" >&2
+		exit 1
+		;;
+		"-a") echo "CHYBA: Nespravne argumenty" >&2
+		exit 1
+		;;
+	esac
+
+	path=$(realpath "$1" 2>/dev/null)
+	if [ "$?" -ne 0 ]; then
+		echo "CHYBA: Nespravne argumenty" >&2
+		exit 1
+	fi
+	if [ -f "$path" ]; then
+		"$editor" "$path"
+		if [ "$?" -ne 0 ]; then
+			exit "$?"
+		fi
+		found=$(grep -n "$path": "$WEDI_RC")
+		if [ -z "$found" ]; then
+			name=$(basename "$path")
+			count=1
+			datetime=$(date +%s)
+			echo "$name:$path:$count:$datetime" >> "$WEDI_RC"
+		else
+			line=$(echo "$found" | cut -d : -f 1)
+			sed -i -e "$line"d "$WEDI_RC"
+			name=$(basename "$path")
+			count=$(echo "$found" | cut -d : -f 4)
+			count=$(($count+1))
+			datetime=$(date +%s)
+			echo "$name:$path:$count:$datetime" >> "$WEDI_RC"
+		fi
+	else
+		if [ -d "$path" ]; then
+			found=$(grep -n -x .*$path/[^\/]* "$WEDI_RC")
+			if [ -z "$found" ]; then
+				echo "CHYBA: V zadanem adresari nebyl dosud editovan zadny soubor" >&2
+				exit 1
+			else
+				found=$(grep -n -x .*$path/[^\/]* "$WEDI_RC" | tail -1)
+				path=$(echo "$found" | cut -d : -f 3)
+				"$editor" "$path"
+				if [ "$?" -ne 0 ]; then
+					exit "$?"
+				fi
+				line=$(echo "$found" | cut -d : -f 1)
+				sed -i -e "$line"d "$WEDI_RC"
+				name=$(basename "$path")
+				count=$(echo "$found" | cut -d : -f 4)
+				count=$(($count+1))
+				datetime=$(date +%s)
+				echo "$name:$path:$count:$datetime" >> "$WEDI_RC"
+			fi
+		else
+			echo "CHYBA: Soubor nebo adresar neexistuje" >&2
+			exit 1
+		fi
+	fi
+fi
+
+
+
+if [ "$#" -eq 2 ]; then
+
+	case "$1" in
+		"-m")
+		path=$(realpath "$2" 2>/dev/null)
+		if [ "$?" -ne 0 ]; then
+			echo "CHYBA: Nespravne argumenty" >&2
+			exit 1
+		fi
+		if [ -d "$path" ]; then
+			found=$(grep -n -x .*$path/[^\/]* "$WEDI_RC")
+			if [ -z "$found" ]; then
+				echo "CHYBA: V zadanem adresari nebyl dosud editovan zadny soubor" >&2
+				exit 1
+			else
+				found=$(grep -n -x .*$path/[^\/]* "$WEDI_RC" | sort -t: -nk4 | tail -1)
+				path=$(echo "$found" | cut -f3 -d:)
+				"$editor" "$path"
+				if [ "$?" -ne 0 ]; then
+					exit "$?"
+				fi
+				line=$(grep -n "$path": "$WEDI_RC")
+				line=$(echo "$line" | cut -d : -f 1)
+				sed -i -e "$line"d "$WEDI_RC"
+				name=$(basename "$path")
+				count=$(echo "$found" | cut -d : -f 4)
+				count=$(($count+1))
+				datetime=$(date +%s)
+				echo "$name:$path:$count:$datetime" >> "$WEDI_RC"
+			fi
+		else
+			echo "CHYBA: Adresar neexistuje" >&2
+			exit 1
+		fi
+		;;
+		"-l")
+		path=$(realpath "$2" 2>/dev/null)
+		if [ "$?" -ne 0 ]; then
+			echo "CHYBA: Nespravne argumenty" >&2
+			exit 1
+		fi
+		found=$(grep -x .*$path/[^\/]* "$WEDI_RC" | cut -f1 -d:)
+		if [ -z "$found" ]; then
+			echo "CHYBA: V zadanem adresari nebyl dosud editovan zadny soubor" >&2
+			exit 1
+		else
+			echo "$found"
+		fi
+		;;
+		"-b")
+		path=$(realpath ".")
+		datum="$2"
+		parametr="$1"
+		if [ -d "$path" ]; then
+				found=$(grep -x .*$path/[^\/]* "$WEDI_RC")
+				if [ -z "$found" ]; then
+					echo "CHYBA: V zadanem adresari nebyl dosud editovan zadny soubor" >&2
+					exit 1
+				else
+					timestamp=$(date -d $datum +"%s" 2>/dev/null)
+					if [ "$?" -ne 0 ]; then
+						timestamp=$(date -j -f "%Y-%m-%d_%H:%M:%S" "$datum"_0:0:0 +%s 2>/dev/null)
+						if [ "$?" -ne 0 ]; then
+							echo "CHYBA: Spatny format data!" >&2
+							exit 1
+						fi
+					fi
+					found=$(echo "$found" | awk -F  ":" -v timestamp="$timestamp" '{if ($4<timestamp) print $1}')
+					if [ -z "$found" ]; then
+						echo "CHYBA: Nenalezen zadny soubor, ktery byl editovan pred datem '$datum'" >&2
+						exit 1
+					else
+						echo "$found"
+					fi
+				fi
+		else
+			echo "CHYBA: Adresar neexistuje" >&2
+			exit 1
+		fi
+		;;
+		"-a")
+		path=$(realpath ".")
+		datum="$2"
+		parametr="$1"
+		if [ -d "$path" ]; then
+				found=$(grep -x .*$path/[^\/]* "$WEDI_RC")
+				if [ -z "$found" ]; then
+					echo "CHYBA: V zadanem adresari nebyl dosud editovan zadny soubor" >&2
+					exit 1
+				else
+					timestamp=$(date -d $datum +"%s" 2>/dev/null)
+					if [ "$?" -ne 0 ]; then
+						timestamp=$( date -j -f "%Y-%m-%d_%H:%M:%S" "$datum"_0:0:0 +%s 2>/dev/null)
+						if [ "$?" -ne 0 ]; then
+							echo "CHYBA: Spatny format data!" >&2
+							exit 1
+						fi
+					fi
+					found=$(echo "$found" | awk -F  ":" -v timestamp="$timestamp" '{if ($4>=timestamp) print $1}')
+					if [ -z "$found" ]; then
+						echo "CHYBA: Nenalezen zadny soubor, ktery byl editovan po datu '$datum' vcetne" >&2
+						exit 1
+					else
+						echo "$found"
+					fi
+				fi
+		else
+			echo "CHYBA: Adresar neexistuje" >&2
+			exit 1
+		fi
+		;;
+		*) echo "CHYBA: Neplatny argument \'$1\'" >&2
+		exit 1
+		;;
+	esac
+
+fi
+
+if [ "$#" -eq 3 ]; then
+	path=$(realpath "$3" 2>/dev/null)
+	if [ "$?" -ne 0 ]; then
+		echo "CHYBA: Nespravne argumenty" >&2
+		exit 1
+	fi
+	datum="$2"
+	parametr="$1"
+	if [ -d "$path" ]; then
+		case "$parametr" in
+			"-b")
+			found=$(grep -x .*$path/[^\/]* "$WEDI_RC")
+			if [ -z "$found" ]; then
+				echo "CHYBA: V zadanem adresari nebyl dosud editovan zadny soubor" >&2
+				exit 1
+			else
+				timestamp=$(date -d $datum +"%s" 2>/dev/null)
+				if [ "$?" -ne 0 ]; then
+					timestamp=$( date -j -f "%Y-%m-%d_%H:%M:%S" "$datum"_0:0:0 +%s 2>/dev/null)
+					if [ "$?" -ne 0 ]; then
+						echo "CHYBA: Spatny format data!" >&2
+						exit 1
+					fi
+				fi
+				found=$(echo "$found" | awk -F  ":" -v timestamp="$timestamp" '{if ($4<timestamp) print $1}')
+				if [ -z "$found" ]; then
+					echo "CHYBA: Nenalezen zadny soubor, ktery byl editovan pred datem '$datum'" >&2
+					exit 1
+				else
+					echo "$found"
+				fi
+			fi
+			;;
+			"-a")
+			found=$(grep -x .*$path/[^\/]* "$WEDI_RC")
+			if [ -z "$found" ]; then
+				echo "CHYBA: V zadanem adresari nebyl dosud editovan zadny soubor" >&2
+				exit 1
+			else
+				timestamp=$(date -d $datum +"%s" 2>/dev/null)
+				if [ "$?" -ne 0 ]; then
+					timestamp=$( date -j -f "%Y-%m-%d_%H:%M:%S" "$datum"_0:0:0 +%s 2>/dev/null)
+					if [ "$?" -ne 0 ]; then
+						echo "CHYBA: Spatny format data!" >&2
+						exit 1
+					fi
+				fi
+				found=$(echo "$found" | awk -F  ":" -v timestamp="$timestamp" '{if ($4>=timestamp) print $1}')
+				if [ -z "$found" ]; then
+					echo "CHYBA: Nenalezen zadny soubor, ktery byl editovan po datu '$datum' vcetne" >&2
+					exit 1
+				else
+					echo "$found"
+				fi
+			fi
+			;;
+		esac
+	else
+		echo "CHYBA: Adresar neexistuje" >&2
+		exit 1
+	fi
+
+fi
+
+if [ "$#" -ge "4" ]; then
+	echo "CHYBA: Prilis mnoho argumentu!"
+	exit 1
+fi
+
+exit 0
